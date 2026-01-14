@@ -1,0 +1,31 @@
+{{- $spec := .observed.composite.resource.spec }}
+{{- $metadata := .observed.composite.resource.metadata }}
+{{- $name := $metadata.name }}
+
+{{- $defaultLabels := dict
+    "hops.ops.com.ai/managed" "true"
+    "hops.ops.com.ai/dotaistack" $name
+}}
+{{- $labels := merge (default dict $spec.labels) $defaultLabels }}
+
+{{- $providerConfigName := dig "providerConfigRef" "name" $spec.clusterName $spec }}
+{{- $providerConfigKind := dig "providerConfigRef" "kind" "ProviderConfig" $spec }}
+
+{{- $effectiveSpec := dict
+    "clusterName" $spec.clusterName
+    "namespace" (default "dot-ai" $spec.namespace)
+    "labels" $labels
+    "providerConfigRef" (dict "name" $providerConfigName "kind" $providerConfigKind)
+    "values" (default dict $spec.values)
+    "overrideAllValues" (default dict $spec.overrideAllValues)
+    "managementPolicies" (default (list "*") $spec.managementPolicies)
+}}
+
+{{- $state := dict
+    "name" $name
+    "namespace" $metadata.namespace
+    "spec" (dict "raw" $spec "effective" $effectiveSpec)
+    "observed" (dig "resources" dict .observed)
+}}
+
+{{- $_ := set $ "$state" $state }}

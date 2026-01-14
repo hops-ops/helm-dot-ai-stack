@@ -1,0 +1,21 @@
+name: CI
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  validate:
+    uses: unbounded-tech/github-actions/.github/workflows/crossplane-validate.yaml@main
+    with:
+      examples: examples/dotaistacks/minimal.yaml examples/dotaistacks/standard.yaml
+  test:
+    uses: unbounded-tech/github-actions/.github/workflows/crossplane-test.yaml@main
+    with:
+      test-dir: tests/test-render
+  publish:
+    needs: [validate, test]
+    uses: unbounded-tech/github-actions/.github/workflows/crossplane-publish.yaml@main
+    with:
+      package-name: helm-dot-ai-stack
+      registry: ghcr.io/hops-ops
+      tag: pr-${{ github.event.number }}
+    secrets: inherit

@@ -1,0 +1,23 @@
+{{- $state := get $ "$state" }}
+{{- $das := $state.dotaistack }}
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $das.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-dotaistack" }}
+  labels: {{ $das.labels | toJson }}
+spec:
+  forProvider:
+    chart:
+      name: dot-ai-stack
+      url: oci://ghcr.io/vfarcic/dot-ai-stack/charts/dot-ai-stack
+      version: 0.192.0
+    namespace: {{ $das.namespace }}
+    values: {{ $das.values | toJson }}
+  managementPolicies: {{ $das.managementPolicies | toJson }}
+  providerConfigRef:
+    name: {{ $das.providerConfigRef.name }}
+    kind: {{ $das.providerConfigRef.kind }}
+  rollbackLimit: 3

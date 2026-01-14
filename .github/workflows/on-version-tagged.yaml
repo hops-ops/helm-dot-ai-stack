@@ -1,0 +1,12 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+jobs:
+  publish:
+    uses: unbounded-tech/github-actions/.github/workflows/crossplane-publish.yaml@main
+    with:
+      package-name: helm-dot-ai-stack
+      registry: ghcr.io/hops-ops
+      tag: ${{ github.ref_name }}
+    secrets: inherit

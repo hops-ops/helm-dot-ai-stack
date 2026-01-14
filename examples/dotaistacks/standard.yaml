@@ -1,0 +1,23 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: DotAIStack
+metadata:
+  name: dot-ai
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+  labels:
+    team: platform
+  values:
+    dot-ai:
+      ingress:
+        enabled: true
+        className: nginx
+        host: dot-ai.example.com
+      webUI:
+        baseUrl: https://dot-ai.example.com
+      resources:
+        limits:
+          memory: 512Mi
+        requests:
+          memory: 256Mi
+          cpu: 100m

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: helm-dot-ai-stack
+description: Installs DevOps AI Toolkit Stack (dot-ai) Helm chart.
+version: 0.0.1

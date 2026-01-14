@@ -1,0 +1,21 @@
+{{- $state := get $ "$state" }}
+{{- $spec := $state.spec.effective }}
+
+{{- $defaultValues := dict
+    "fullnameOverride" $state.name
+    "nameOverride" $state.name
+}}
+
+{{- $hasOverride := gt (len $spec.overrideAllValues) 0 }}
+{{- $values := ternary $spec.overrideAllValues (merge $spec.values $defaultValues) $hasOverride }}
+
+{{- $dotaistack := dict
+    "releaseName" $state.name
+    "namespace" $spec.namespace
+    "labels" $spec.labels
+    "values" $values
+    "providerConfigRef" $spec.providerConfigRef
+    "managementPolicies" $spec.managementPolicies
+}}
+
+{{- $_ := set $state "dotaistack" $dotaistack }}

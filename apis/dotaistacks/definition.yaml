@@ -1,0 +1,58 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: dotaistacks.helm.hops.ops.com.ai
+spec:
+  group: helm.hops.ops.com.ai
+  names:
+    kind: DotAIStack
+    plural: dotaistacks
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - clusterName
+            properties:
+              clusterName:
+                type: string
+                description: Name of the target cluster for the Helm release.
+              namespace:
+                type: string
+                description: Namespace for the Helm release.
+                default: dot-ai
+              labels:
+                type: object
+                description: Labels to apply to all resources.
+                x-kubernetes-preserve-unknown-fields: true
+              providerConfigRef:
+                type: object
+                description: Reference to the Helm ProviderConfig.
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    default: ProviderConfig
+              values:
+                type: object
+                description: Helm values merged with defaults.
+                x-kubernetes-preserve-unknown-fields: true
+              overrideAllValues:
+                type: object
+                description: Helm values that replace all defaults.
+                x-kubernetes-preserve-unknown-fields: true
+              managementPolicies:
+                type: array
+                description: Management policies for the composite resource.
+                items:
+                  type: string
+                default:
+                - '*'
