@@ -40,14 +40,13 @@ jobs:
   test:
     uses: unbounded-tech/workflows-crossplane/.github/workflows/test.yaml@v2.13.0
 
-  e2e:
-    uses: unbounded-tech/workflows-crossplane/.github/workflows/e2e.yaml@v2.13.0
+  # NOTE: No e2e tests - dot-ai-stack requires API keys (Anthropic, OpenAI)
+  # and external services to become healthy. Cannot run in kind cluster.
 
   publish:
     needs:
       - validate
       - test
-      - e2e
     uses: unbounded-tech/workflows-crossplane/.github/workflows/publish.yaml@v2.13.0
     secrets: inherit
     with:

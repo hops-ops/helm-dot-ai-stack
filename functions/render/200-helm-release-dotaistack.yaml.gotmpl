@@ -1,5 +1,21 @@
-{{- $state := get $ "$state" }}
+# code: language=yaml
+#
+# Helm release for dot-ai-stack
+#
+# This deploys the DevOps AI Toolkit stack including:
+# - dot-ai MCP server
+# - dot-ai-controller (installs CRDs)
+# - dot-ai-ui
+# - Qdrant vector database
+#
+# Note: skipHooks is required because the chart's post-install hooks create
+# CapabilityScanConfig/ResourceSyncConfig resources before Kubernetes has
+# fully registered the CRDs from the controller subchart. Users can create
+# these configuration resources manually after installation.
+#
+
 {{- $das := $state.dotaistack }}
+
 ---
 apiVersion: helm.m.crossplane.io/v1beta1
 kind: Release
@@ -9,15 +25,30 @@ metadata:
     {{ setResourceNameAnnotation "helm-release-dotaistack" }}
   labels: {{ $das.labels | toJson }}
 spec:
+  managementPolicies: {{ $das.managementPolicies | toJson }}
   forProvider:
     chart:
       name: dot-ai-stack
       url: oci://ghcr.io/vfarcic/dot-ai-stack/charts/dot-ai-stack
       version: 0.192.0
     namespace: {{ $das.namespace }}
-    values: {{ $das.values | toJson }}
-  managementPolicies: {{ $das.managementPolicies | toJson }}
+    {{- if $das.overrideAllValues }}
+    values:
+      {{- toYaml $das.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: {{ $das.releaseName }}
+      nameOverride: {{ $das.releaseName }}
+      # Disable features that use hooks creating CRs before CRDs are registered
+      resourceSync:
+        enabled: false
+      capabilityScan:
+        enabled: false
+      {{- if $das.values }}
+      {{- toYaml $das.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
   providerConfigRef:
     name: {{ $das.providerConfigRef.name }}
     kind: {{ $das.providerConfigRef.kind }}
-  rollbackLimit: 3
