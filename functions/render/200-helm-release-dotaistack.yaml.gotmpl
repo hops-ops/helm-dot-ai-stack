@@ -37,8 +37,6 @@ spec:
       {{- toYaml $das.overrideAllValues | nindent 6 }}
     {{- else }}
     values:
-      fullnameOverride: {{ $das.releaseName }}
-      nameOverride: {{ $das.releaseName }}
       # Disable features that use hooks creating CRs before CRDs are registered
       resourceSync:
         enabled: false
